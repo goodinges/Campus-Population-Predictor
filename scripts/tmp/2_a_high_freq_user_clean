@@ -1,0 +1,15 @@
+#! /usr/bin/env python3.2
+with open("../outs/1") as dirtyUser:
+	content = dirtyUser.readlines();
+def func(item):
+	if "6809274T61RF" in item:
+		return True
+	else:
+		return False
+
+content2 = [x for x in content if func(x)]
+content2.sort()
+out1 = open(r"../outs/1","w")
+for item in content2:
+	out1.write("%s" % item);
+out1.close()

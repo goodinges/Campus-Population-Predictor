@@ -1,0 +1,3 @@
+#!/bin/bash
+#This script read the logs and filter for only for specific user for clearing algorithm devising and testing
+grep 6809274T61RF ../outs/0 > ../outs/1

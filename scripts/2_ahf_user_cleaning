@@ -1,0 +1,44 @@
+#!/usr/bin/env python3.2
+#Implementation of the simple algorithm for removing the noise logs of malfunctioning devices (redundant logs)
+#In all scripts we should read files line by line and not one at a time since for future large files we will have memory problems otherwise. This also usually assuems that the input is sorted. We should exercise cautions about that too.
+import time
+from collections import Counter
+threshold = 650 #Seconds
+logFile = open("../outs/1","r")
+outFile = open(r"../outs/2","w")
+
+apsFile = open(r"../newyork.aps","r")
+APsList = apsFile.readlines();
+APsDict = {i.split()[1]:i.split("\t")[2] for i in APsList}
+
+currentLocationLogs = []
+lastLog = logFile.readline()
+lastLog = lastLog[:-2] + "\t" + APsDict[lastLog.split()[2]]
+currentLocationLogs.append(lastLog)
+nextLog = logFile.readline()
+nextLog = nextLog[:-2] + "\t" + APsDict[nextLog.split()[2]]
+while nextLog!='':
+	nextLog = nextLog[:-2] + "\t" + APsDict[nextLog.split()[2]]
+	if lastLog.split("\t")[1] != nextLog.split("\t")[1]:
+		lastTime = time.mktime(time.strptime(lastLog[:19],"%m/%d/%Y %H:%M:%S"))
+		nextTime = time.mktime(time.strptime(nextLog[:19],"%m/%d/%Y %H:%M:%S"))
+		if nextTime - lastTime > threshold:
+			currentLocationLogs_APs = [i.split("\t")[1] for i in currentLocationLogs]
+			estimatedLocation = Counter(currentLocationLogs_APs).most_common()[0][0]
+			estimatedStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
+			estimatedEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
+			outFile.write(lastLog.split()[3] + "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)+"\t"+estimatedLocation)
+			del currentLocationLogs[:]
+	currentLocationLogs.append(nextLog)
+	lastLog = nextLog
+	nextLog = logFile.readline()
+
+currentLocationLogs_APs = [i.split("\t")[1] for i in currentLocationLogs]
+estimatedLocation = Counter(currentLocationLogs_APs).most_common()[0][0]
+estimatedStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
+estimatedEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
+outFile.write(lastLog.split()[3] + "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)+"\t"+estimatedLocation)
+del currentLocationLogs[:]
+
+logFile.close()
+outFile.close()
