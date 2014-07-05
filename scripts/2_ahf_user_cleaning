@@ -3,31 +3,52 @@
 #In all scripts we should read files line by line and not one at a time since for future large files we will have memory problems otherwise. This also usually assuems that the input is sorted. We should exercise cautions about that too.
 import time
 from collections import Counter
-threshold = 650 #Seconds
+from datetime import datetime
+threshold = 5*60 #Seconds
 logFile = open("../outs/1","r")
 outFile = open(r"../outs/2","w")
 
 apsFile = open(r"../newyork.aps","r")
 APsList = apsFile.readlines();
-APsDict = {i.split()[1]:i.split("\t")[2] for i in APsList}
+APsDict = {i.split()[1]:i.split("\t")[2].split(">")[2][1:-1] for i in APsList}
 
 currentLocationLogs = []
 lastLog = logFile.readline()
-lastLog = lastLog[:-2] + "\t" + APsDict[lastLog.split()[2]]
+estimatedStartTime = time.strptime(lastLog[:19],"%m/%d/%Y %H:%M:%S")
+lastLog = lastLog[:-1] + "\t" + APsDict[lastLog.split()[2]]
 currentLocationLogs.append(lastLog)
 nextLog = logFile.readline()
-nextLog = nextLog[:-2] + "\t" + APsDict[nextLog.split()[2]]
 while nextLog!='':
-	nextLog = nextLog[:-2] + "\t" + APsDict[nextLog.split()[2]]
+	nextLog = nextLog[:-1] + "\t" + APsDict[nextLog.split()[2]]
 	if lastLog.split("\t")[1] != nextLog.split("\t")[1]:
 		lastTime = time.mktime(time.strptime(lastLog[:19],"%m/%d/%Y %H:%M:%S"))
 		nextTime = time.mktime(time.strptime(nextLog[:19],"%m/%d/%Y %H:%M:%S"))
 		if nextTime - lastTime > threshold:
 			currentLocationLogs_APs = [i.split("\t")[1] for i in currentLocationLogs]
-			estimatedLocation = Counter(currentLocationLogs_APs).most_common()[0][0]
-			estimatedStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
-			estimatedEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
-			outFile.write(lastLog.split()[3] + "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)+"\t"+estimatedLocation)
+			locationCounters = Counter(currentLocationLogs_APs).most_common();
+			estimatedLocation = locationCounters[0][0];
+			estimatedLocationCertaincy = locationCounters[0][1]/len(currentLocationLogs)*100;
+			estimatedEndTime = time.localtime((nextTime - lastTime)/2 + lastTime)
+			estimatedDuration = datetime.fromtimestamp(time.mktime(estimatedEndTime)) - datetime.fromtimestamp(time.mktime(estimatedStartTime))
+			certainStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
+			certainEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
+			certainDuration = datetime.fromtimestamp(time.mktime(certainEndTime)) - datetime.fromtimestamp(time.mktime(certainStartTime))
+			outFile.write(lastLog.split()[3] 
+				+ "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)
+				+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)
+				+"\t"+str(estimatedDuration)
+				+"\t\t"+time.strftime("%m/%d/%Y %H:%M:%S", certainStartTime)
+				+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", certainEndTime)
+				+ "\t" + str(certainDuration)+"\t\n|"+estimatedLocation
+				+"|"+ '%.2f' % estimatedLocationCertaincy
+				+'(%d)'  % locationCounters[0][1]
+				+'|%.2f' % (((locationCounters[1][1]/len(currentLocationLogs))*100) if len(locationCounters)>1 else 0)
+				+'(%d)'  % ((locationCounters[1][1]) if len(locationCounters)>1 else 0)
+				+'|%.2f' % (((locationCounters[2][1]/len(currentLocationLogs))*100) if len(locationCounters)>2 else 0)
+				+"|"+str(len(currentLocationLogs))
+				+("|"+locationCounters[1][0] if len(locationCounters)>1 else '')
+				+("|"+locationCounters[2][0] if len(locationCounters)>2 else '') +"\n")
+			estimatedStartTime = estimatedEndTime;
 			del currentLocationLogs[:]
 	currentLocationLogs.append(nextLog)
 	lastLog = nextLog
@@ -35,9 +56,12 @@ while nextLog!='':
 
 currentLocationLogs_APs = [i.split("\t")[1] for i in currentLocationLogs]
 estimatedLocation = Counter(currentLocationLogs_APs).most_common()[0][0]
-estimatedStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
-estimatedEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
-outFile.write(lastLog.split()[3] + "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)+"\t"+estimatedLocation)
+certainStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")
+certainEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
+estimatedEndTime = certainEndTime
+estimatedDuration = datetime.fromtimestamp(time.mktime(estimatedEndTime)) - datetime.fromtimestamp(time.mktime(estimatedStartTime))
+outFile.write(lastLog.split()[3] + "\t" + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)+"\t"+str(estimatedDuration)+"\t\t"+time.strftime("%m/%d/%Y %H:%M:%S", certainStartTime)+"\t"+time.strftime("%m/%d/%Y %H:%M:%S", certainEndTime)+"\t"+estimatedLocation)
+estimatedStartTime = estimatedEndTime;
 del currentLocationLogs[:]
 
 logFile.close()
