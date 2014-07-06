@@ -1,4 +1,4 @@
-NYU-Campus-Predictor
+Campus-Predictor
 ====================
 
-Predicting NYU campus usage patterns through wireless authentication logs
+Predicting campus usage patterns through wireless authentication logs
