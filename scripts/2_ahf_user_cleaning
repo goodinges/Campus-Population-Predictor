@@ -66,3 +66,4 @@ del currentLocationLogs[:]
 
 logFile.close()
 outFile.close()
+apsFile.close()
