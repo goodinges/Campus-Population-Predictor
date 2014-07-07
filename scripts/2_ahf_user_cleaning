@@ -25,9 +25,9 @@ while nextLog!='':
 		nextTime = time.mktime(time.strptime(nextLog[:19],"%m/%d/%Y %H:%M:%S"))
 		if nextTime - lastTime > threshold:
 			currentLocationLogs_APs = [i.split("\t")[1] for i in currentLocationLogs]
-			locationCounters = Counter(currentLocationLogs_APs).most_common();
-			estimatedLocation = locationCounters[0][0];
-			estimatedLocationCertaincy = locationCounters[0][1]/len(currentLocationLogs)*100;
+			locationCounters = Counter(currentLocationLogs_APs).most_common()
+			estimatedLocation = locationCounters[0][0]
+			estimatedLocationCertaincy = locationCounters[0][1]/len(currentLocationLogs)*100
 			estimatedEndTime = time.localtime((nextTime - lastTime)/2 + lastTime)
 			estimatedDuration = datetime.fromtimestamp(time.mktime(estimatedEndTime)) - datetime.fromtimestamp(time.mktime(estimatedStartTime))
 			certainStartTime = time.strptime(currentLocationLogs[0][:19],"%m/%d/%Y %H:%M:%S")

@@ -60,7 +60,8 @@ while nextLog != '':
 			+ '\t%%%.2f' % (((locationCounters[2][1]/len(currentLocationLogs))*100) if len(locationCounters)>2 else 0)
 			+ '(%d)'  % ((locationCounters[2][1]) if len(locationCounters)>2 else 0)
 			+ ("\t"+locationCounters[1][0] if len(locationCounters)>1 else '')
-			+("\t"+locationCounters[2][0] if len(locationCounters)>2 else '') +"\n\n")
+			+ ("\t"+locationCounters[2][0] if len(locationCounters)>2 else '')
+			+ "\n")
 		
 		estimatedStartTime = estimatedEndTime
 
@@ -70,7 +71,7 @@ while nextLog != '':
 	currentLocationLogs.append(lastLog)
 	nextLog = logFile.readline()
 
-currentLocations = [i.split('\t')[3]+ ' ' +i.split('\t')[4] for i in currentLocationLogs]
+currentLocations = [i.split('\t')[3]+ '->' +i.split('\t')[4][:-1] for i in currentLocationLogs]
 locationCounters = Counter(currentLocations).most_common()
 estimatedLocation = locationCounters[0][0]
 estimatedLocation_certaincy = locationCounters[0][1]/len(currentLocationLogs)*100
@@ -80,23 +81,30 @@ certainEndTime = time.strptime(currentLocationLogs[-1][:19],"%m/%d/%Y %H:%M:%S")
 certainDuration = datetime.fromtimestamp(time.mktime(certainEndTime)) - datetime.fromtimestamp(time.mktime(certainStartTime))
 
 estimatedEndTime = certainEndTime
+estimatedDuration_seconds = time.mktime(estimatedEndTime) - time.mktime(estimatedStartTime)
 estimatedDuration = datetime.fromtimestamp(time.mktime(estimatedEndTime)) - datetime.fromtimestamp(time.mktime(estimatedStartTime))
 
-outFile.write(lastLog_splits[2]
+isPassing = 'PASS\t' if estimatedDuration_seconds <= stayThreshold else 'STAY\t'
+
+outFile.write(isPassing
+	+ lastLog_splits[2]
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)
 	+ '\t' + str(estimatedDuration)
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", certainStartTime)
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", certainEndTime)
 	+ '\t' + str(certainDuration)
-	+'\t\n' + estimatedLocation
-	+'\t%.2f' % estimatedLocation_certaincy
-	+'(%d)'  % locationCounters[0][1]
-	+'\t%.2f' % (((locationCounters[1][1]/len(currentLocationLogs))*100) if len(locationCounters)>1 else 0)
-	+'(%d)'  % ((locationCounters[1][1]) if len(locationCounters)>1 else 0)
-	+'\t%.2f' % (((locationCounters[2][1]/len(currentLocationLogs))*100) if len(locationCounters)>2 else 0)
-	+"\t" + str(len(currentLocationLogs))
-	+("\t"+locationCounters[1][0] if len(locationCounters)>1 else '')
-	+("\t"+locationCounters[2][0] if len(locationCounters)>2 else '') +"\n")
+	+ '\t' + estimatedLocation
+	+ '\t%.2f' % estimatedLocation_certaincy
+	+ '(%d)'  % locationCounters[0][1]
+	+ '\t%.2f' % (((locationCounters[1][1]/len(currentLocationLogs))*100) if len(locationCounters)>1 else 0)
+	+ '(%d)'  % ((locationCounters[1][1]) if len(locationCounters)>1 else 0)
+	+ '\t%.2f' % (((locationCounters[2][1]/len(currentLocationLogs))*100) if len(locationCounters)>2 else 0)
+	+ "\t" + str(len(currentLocationLogs))
+	+ ("\t"+locationCounters[1][0] if len(locationCounters)>1 else '')
+	+ ("\t"+locationCounters[2][0] if len(locationCounters)>2 else '') +"\n")
 		
 del currentLocationLogs[:]
+
+logFile.close() 
+outFile.close()
