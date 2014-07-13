@@ -1,0 +1,2 @@
+#!/bin/bash
+./6_filter_by_user_with_AP $1 | ./7_custom_3 | ./8_custom_4 > ../outs/allusers/$1.out

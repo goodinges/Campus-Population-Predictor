@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.2
 #This is just for looking at data with names. I won't use it in the next script since the next one already extract floor names by itself
 #Update:
-#I turned out I will change the algorithm reasoning from looking at access point macs to locations based on buildings and floors and therefore I will use the output of this file for feeding the new algorithm
+#It turned out I will change the algorithm reasoning from looking at access point macs to locations based on buildings and floors and therefore I will use the output of this file for feeding the new algorithm
 
 logFile = open("../outs/1","r")
 outFile = open(r"../outs/1.5","w")

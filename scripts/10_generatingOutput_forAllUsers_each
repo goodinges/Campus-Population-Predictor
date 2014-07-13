@@ -1,0 +1,13 @@
+#!/usr/bin/env python3.2
+
+import sys
+import os
+
+usersFile = open("../outs/5","r")
+
+users = usersFile.readlines();
+
+for line in users:
+	os.system("./9_generateFinalOutput_forOne "+ line.split('\t')[0])
+
+userFile.close()

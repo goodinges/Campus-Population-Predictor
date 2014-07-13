@@ -6,8 +6,8 @@ from collections import Counter
 from datetime import datetime
 import sys
 
-recordsFile = open("../outs/3","r")
-outFile = open(r"../outs/4","w")
+recordsFile = sys.stdin
+outFile = sys.stdout
 
 currentRecords = []
 
@@ -34,10 +34,9 @@ nextRecord_splits = nextRecord.split('\t')
 
 while nextRecord != '':
 
-	#print(nextRecord)
-	#print(nextRecord_splits)
-#	print(currentLocation)
 	if nextRecord_splits[8] == currentLocation:
+		currentRecords.append(nextRecord);
+
 		mergedRecord = 'STEM\t' + nextRecord_splits[1]
 
 		estimatedStartTime = time.strptime(currentRecords[0].split('\t')[2],"%m/%d/%Y %H:%M:%S")

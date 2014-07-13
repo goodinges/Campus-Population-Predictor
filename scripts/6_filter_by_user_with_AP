@@ -1,0 +1,22 @@
+#!/usr/bin/env python3.2
+import sys
+
+user = sys.argv[1]
+
+logFile = open("../outs/0","r")
+apsFile = open(r"../newyork.aps","r")
+
+APsList = apsFile.readlines();
+APsDict = {i.split()[1]:i.split("\t")[2].split(" > ")[1] + "\t" + i.split("\t")[2].split(" > ")[2][:-1] for i in APsList}
+
+logs = logFile.readlines();
+logs = filter(lambda log: log.split()[3]==user,logs)
+logs = {i[0:-1].replace(' ','\t').replace('\t',' ',1)+"\t"+APsDict.get(i.split()[2],i.split()[2]+"\t"+i.split()[2])+"\n" for i in logs}
+logs = list(logs)
+logs.sort()
+
+for line in logs:
+	sys.stdout.write(line)
+
+logFile.close()
+apsFile.close()

@@ -4,13 +4,13 @@
 import time
 from collections import Counter
 from datetime import datetime
+import sys
 
 floorThreshold = 30 #Seconds
 buildingThreshold = 30 #Seconds
 stayThreshold = 5*60 #Seconds
 
-logFile = open("../outs/1.5","r")
-outFile = open(r"../outs/3","w")
+logFile = sys.stdin
 
 currentLocationLogs = []
 
@@ -43,7 +43,7 @@ while nextLog != '':
 		
 		isPassing = 'PASS\t' if estimatedDuration_seconds <= stayThreshold else 'STAY\t'
 
-		outFile.write(isPassing
+		sys.stdout.write(isPassing
 			+ lastLog_splits[2]
 			+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)
 			+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)
@@ -86,7 +86,7 @@ estimatedDuration = datetime.fromtimestamp(time.mktime(estimatedEndTime)) - date
 
 isPassing = 'PASS\t' if estimatedDuration_seconds <= stayThreshold else 'STAY\t'
 
-outFile.write(isPassing
+sys.stdout.write(isPassing
 	+ lastLog_splits[2]
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedStartTime)
 	+ '\t' + time.strftime("%m/%d/%Y %H:%M:%S", estimatedEndTime)
@@ -108,4 +108,3 @@ outFile.write(isPassing
 del currentLocationLogs[:]
 
 logFile.close() 
-outFile.close()
