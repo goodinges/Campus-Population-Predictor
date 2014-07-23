@@ -17,13 +17,13 @@ currentLocationLogs = []
 
 lastLog = logFile.readline()
 estimatedStartTime = time.strptime(lastLog[:19],"%m/%d/%Y %H:%M:%S")
+lastLog_splits = lastLog.split('\t')
 
 currentLocationLogs.append(lastLog)
 nextLog = logFile.readline()
 while nextLog != '':
 	
 	nextLog_splits = nextLog.split('\t')
-	lastLog_splits = lastLog.split('\t')
 	lastLog_time = time.mktime(time.strptime(lastLog[:19],"%m/%d/%Y %H:%M:%S"))
 	nextLog_time = time.mktime(time.strptime(nextLog[:19],"%m/%d/%Y %H:%M:%S"))
 	if (nextLog_splits[3] != lastLog_splits[3] and nextLog_time - lastLog_time >= buildingThreshold) or (nextLog_splits[3] == lastLog_splits[3] and nextLog_splits[4] != lastLog_splits[4] and nextLog_time - lastLog_time >= floorThreshold):
@@ -69,6 +69,7 @@ while nextLog != '':
 
 	lastLog = nextLog
 	currentLocationLogs.append(lastLog)
+	lastLog_splits = lastLog.split('\t')
 	nextLog = logFile.readline()
 
 currentLocations = [i.split('\t')[3]+ '->' +i.split('\t')[4][:-1] for i in currentLocationLogs]

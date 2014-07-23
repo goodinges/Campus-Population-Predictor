@@ -1,0 +1,22 @@
+#!/usr/bin/env python3.2
+import os
+
+tmpFileAd = "../outs/tmp/0.tmp2"
+
+os.system("./0_1_removing_19th_and_sorting " + tmpFileAd)
+
+logFile = open(tmpFileAd,"r")
+outFile = open(r"../outs/0","w")
+
+
+log = logFile.readline()
+while log!='':
+	user = log[33:]
+	user = user.replace('/','-')
+	outFile.write(log[:33] + user)
+	log = logFile.readline()
+
+os.system("rm " + tmpFileAd)
+
+logFile.close()
+outFile.close()

@@ -1,5 +1,5 @@
 #!/bin/bash
 mkdir ../outs/tmp -p
 grep -v 04/19/2013 ../authentication.records > ../outs/tmp/0.tmp1
-sort -o ../outs/0 ../outs/tmp/0.tmp1
+sort -o $1 ../outs/tmp/0.tmp1
 rm ../outs/tmp/0.tmp1

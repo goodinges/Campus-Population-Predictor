@@ -8,6 +8,8 @@ usersFile = open("../outs/5","r")
 users = usersFile.readlines();
 
 for line in users:
-	os.system("./9_generateFinalOutput_forOne "+ line.split('\t')[0])
+	user = line.split('\t')[0]
+	if os.path.isfile("../outs/allusers/"+user+".out")== False:
+		os.system("./9_generateFinalOutput_forOne "+ line.split('\t')[0])
 
 userFile.close()

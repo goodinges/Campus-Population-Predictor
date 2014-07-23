@@ -1,0 +1,1 @@
+ls -clt | grep ' 0 Jul' | cut -c62-77 | xargs rm
