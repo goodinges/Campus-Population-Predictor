@@ -4,13 +4,16 @@ import sys
 import os
 from multiprocessing import Process
 from multiprocessing import Pool
+import datetime
 
 def f(line):
 	user = line.split('\t')[0]
 	path = ("../outs/allusers/"+user+".out")
 #	if os.path.isfile(path)== False:
 #		print(user)
+	#now = datetime.datetime.now()
 	os.system("./9_generateFinalOutput_forOne "+ user)
+	#print(datetime.datetime.now() - now)
 
 usersFile = open("../outs/5","r")
 

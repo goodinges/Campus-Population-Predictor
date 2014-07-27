@@ -7,13 +7,18 @@ os.system("./0_1_removing_19th_and_sorting " + tmpFileAd)
 
 logFile = open(tmpFileAd,"r")
 outFile = open(r"../outs/0","w")
+apsFile = open(r"../newyork.aps","r")
 
+APsList = apsFile.readlines();
+APsDict = {i.split()[1]:i.split("\t")[2].split(" > ")[1] + "\t" + i.split("\t")[2].split(" > ")[2][:-1] for i in APsList}
 
 log = logFile.readline()
 while log!='':
 	user = log[33:]
 	user = user.replace('/','-')
-	outFile.write(log[:33] + user)
+	log = log[:33] + user
+	log = log[0:-1].replace(' ','\t').replace('\t',' ',1)+"\t"+APsDict.get(log.split()[2],log.split()[2]+"\t"+log.split()[2])+"\n"
+	outFile.write(log)
 	log = logFile.readline()
 
 os.system("rm " + tmpFileAd)
