@@ -1,0 +1,14 @@
+#!/usr/bin/env python3.2
+import sys
+import datetime
+
+user = sys.argv[1]
+
+logFile = open("../outs/0","r")
+
+logs = logFile.readlines();
+logs = filter(lambda log: log.split('\t')[2]==user,logs)
+
+sys.stdout.writelines(logs)
+
+logFile.close()
